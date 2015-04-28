@@ -1,12 +1,12 @@
 {
   "name": "dahi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a port of kefir(frp) for js-csp",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "repository":{
+  "repository": {
     "url": "https://github.com/threepointone/dahi",
     "type": "git"
   },

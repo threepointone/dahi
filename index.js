@@ -284,6 +284,8 @@ export function transduce(ch, xf, keepOpen=false, exHandler=()=>{}){
   return c;
 }
 
+// COMBINE
+
 // todo - combinator
 export function zip(srcs){
   var c = chan();

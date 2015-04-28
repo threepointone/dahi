@@ -1,12 +1,16 @@
 {
   "name": "dahi",
   "version": "1.0.2",
-  "description": "",
+  "description": "a port of kefir(frp) for js-csp",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "author": "",
+  "repository":{
+    "url": "https://github.com/threepointone/dahi",
+    "type": "git"
+  },
+  "author": "Sunil Pai <threepointone@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "js-csp": "^0.4.0"

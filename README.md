@@ -47,6 +47,20 @@ returns a channel with every `event` from emitter
 modify a channel
 ---
 
+`map(channel, fn)`
+
+`filter(channel, fn)`
+
+`takeWhile(channel, fn)`
+
+`flatten(channel)`
+
+`skip(channel, n)`
+
+`skipWhile(channel, fn)`
+
+`skipDuplicates(channel)`
+
 `transduce(channel, xf)`
 applies the transducer `xf` to every value in `channel`
 
@@ -108,3 +122,4 @@ open issues
 - debounce immediate: true
 - audit putAsync usage
 - error handling story
+- fromPromise vs promiseChan

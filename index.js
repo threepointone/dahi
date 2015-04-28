@@ -3,7 +3,8 @@
 "use strict";
 
 import csp, {go, timeout, chan, putAsync, alts, put} from 'js-csp';
-
+let {into, take, pipe} = csp.operations;
+import xd from 'transducers.js';
 
 let {pipelineAsync, pipeline} = csp.operations;
 
@@ -108,6 +109,64 @@ export function log(ch, prefix=''){
 
 // todo - stoplog?
 
+// MODIFY
+
+export function map(ch, fn){
+  return transduce(ch, xd.map(fn));
+}
+
+export function filter(ch, fn){
+ return transduce(ch, xd.filter(fn)); 
+}
+
+export function takeWhile(ch, fn){
+  return transduce(ch, xd.takeWhile(fn))  
+}
+
+export function flatten(ch, fn){
+  var c = chan();
+  go(function*(){
+    var el;
+    while(((el = yield ch)!=csp.CLOSED)){
+      for(let e of el)
+        yield put(c, e);      
+    }
+    c.close();
+  })
+  return c;
+}
+
+export function skip(ch, n){
+   // return transduce(ch, xd.drop(n)); // sigh, doesn't work
+   var c = chan();
+   go(function*(){
+    for(var i=0; i< n;i++){
+      yield ch;
+    }
+    pipeline(c, xd.map(x=> x), ch)
+   })
+   return c;
+}
+
+export function skipWhile(ch, fn){
+  return transduce(ch, xd.dropWhile(fn));  
+}
+
+export function skipDuplicates(ch){
+  // return transduce(ch, xd.dedupe()); // sigh, doesn't work
+  var c = chan();
+  go(function*(){
+    var el, last = {};
+    while(((el = yield ch)!=csp.CLOSED)){
+      if(el!=last){
+        last = el;
+        yield put(c, last)
+      }
+    }
+    c.close();
+  })
+  return c;
+}
 
 
 export function diff(ch, fn = (a,b) => [a,b], seed){

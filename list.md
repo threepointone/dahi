@@ -32,17 +32,6 @@ Main observable methods
 
 - slidingWindow *
 
-- map *
-- filter *
-- take *
-- takeWhile *
-- reduce *
-- flatten *
-
-
-- skip *
-- skipWhile *
-- skipDuplicates *
 
 
 - withHandler *

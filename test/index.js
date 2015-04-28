@@ -17,6 +17,13 @@ import {
   fromEvents,
 
   // modify
+  map,
+  filter,
+  takeWhile,
+  flatten,
+  skip,
+  skipWhile,
+  skipDuplicates,
   diff,
   scan,
   delay,
@@ -113,6 +120,48 @@ describe('create', ()=>{
 });
 
 describe('modify', ()=>{
+  it('map', done => go(function*(){
+    (yield into([], map(sequentially(50, [1, 2, 3, 4, 5]), x => x*x)))
+      .should.eql([1, 4, 9, 16, 25]);
+      done();
+  }))
+
+  it('filter', done => go(function*(){
+    (yield into([], filter(sequentially(50, [1, 2, 3, 4, 5]), x=> x%2===0)))
+      .should.eql([2, 4]);
+    done();
+  }))
+
+  it('takeWhile', done => go(function*(){
+    (yield into([], takeWhile(sequentially(50, [1, 2, 3, 4, 5]), x=> x<3)))
+      .should.eql([1, 2]);
+    done();
+  }))
+
+  it('flatten', done => go(function*(){
+    (yield into([], flatten(sequentially(50, [[1], [], [2, 3]]))))
+      .should.eql([1, 2, 3]);
+    done();
+  }))
+
+  it('skip', done => go(function*(){
+    (yield into([], skip(sequentially(50, [1, 2, 3, 4, 5]), 2)))
+      .should.eql([3, 4, 5]);
+    done();
+  }))
+
+  it('skipWhile', done => go(function*(){
+    (yield into([], skipWhile(sequentially(50, [1, 2, 3, 4, 5]), x=> x<3)))
+      .should.eql([3, 4, 5]);
+    done();
+  }))
+
+  it('skipDuplicates', done => go(function*(){
+    (yield into([], skipDuplicates(fromColl([1, 1, 1, 1, 3, 3, 3, 1, 1, 2, 2, 6, 6, 7, 8, 9]))))
+      .should.eql([1, 3, 1, 2, 6, 7, 8, 9]);
+    done();
+  }))
+
   it('diff', done => go(function*(){  
     (yield into([], diff(fromColl([1, 2, 3, 4, 5]), (prev, next) => next - prev, 0)))
       .should.eql([1, 1, 1, 1, 1]);

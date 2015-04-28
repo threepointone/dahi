@@ -110,7 +110,7 @@ export function log(ch, prefix=''){
 
 
 
-export function diff(ch, fn, seed){
+export function diff(ch, fn = (a,b) => [a,b], seed){
   var c = chan();
   go(function*(){
     if(typeof seed === 'undefined'){

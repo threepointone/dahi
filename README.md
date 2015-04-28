@@ -7,6 +7,8 @@ a port of [kefir](https://pozadi.github.io/kefir/) for channels from [js-csp](ht
 
 `npm install dahi`
 
+(these api docs are derived/modified from kefir)
+
 create a channel
 ---
 
@@ -32,30 +34,46 @@ creates a channel that calls the given `handler` function, with the given `inter
 convert a function than accepts a `callback` as the first argument, to a channel. Emits at most one value when `callback` is called, then ends.
 
 `fromNodeCallback(callback)`
-like `fromCallback`, but accepts a node style callback which gets arguments in the form `(err, res)`. throws when an error is passed. 
+like `fromCallback`, but accepts a node style callback which gets arguments in the form `(err, res)`. 
 
 
 `fromEvents(emitter, event)`
 returns a channel with every `event` from emitter
 
+modify a channel
+---
+
+
+
+
+`transduce`
+
+`diff(channel, fn, seed)`
+On each value from `channel`, calls `fn` with the previous and current values as arguments. At first time, calls `fn` with `seed` and current value. Puts whatever `fn` returns. If no `seed` is provided, the first value will be used as a seed, and the result channel won't put the first value. If no `fn` function is provided, `(a, b) => [a, b]` will be used.
+
+`scan(ch, fn, seed)`
+
+`delay(ch, wait)`
+
+`debounce(ch, wait)`
+
+`throttle(ch, wait)`
+
+`bufferWhile(channel, predicate, flushOnEnd?)`
+
+`zip(channels)`
+
+`concat(channels)`
+
+`filterBy(chan, otherChan)`
+
+`sampledBy(chan, otherChan)`
+
+`takeWhileBy(chan, otherChan)`
+
+`takeUntilBy(chan, otherChan)`
+
+`bufferBy(chan, otherChan)`
 
 `log()`
 logs every put onto the channel
-
-`diff(c1, c2)`
-
-scan
-delay
-debounce
-throttle
-bufferWhile
-transduce
-zip
-concat
-filterBy
-sampledBy
-takeWhileBy
-takeUntilBy
-bufferBy
-
-

@@ -23,13 +23,17 @@ import {
   delay,
   throttle,
   debounce,
+  bufferWhile,
   transduce,
 
   zip,
   concat,
 
-
-  filterBy
+  filterBy,
+  sampledBy,
+  takeWhileBy,
+  takeUntilBy,
+  bufferBy
 } from '../index.js';
 
 function times(n, fn){
@@ -153,6 +157,11 @@ describe('modify', ()=>{
     done();
   }))
 
+  it('bufferWhile', done => go(function*(){
+    (yield into([], bufferWhile(sequentially(50, [1, 2, 3, 4, 5, 6]), el => el%4!==0))).should.eql([[1, 2, 3, 4], [5, 6]]);
+    done();
+  }))
+
   it('transduce', done => go(function*(){
     (yield into([], transduce(sequentially(100, [1, 2, 3, 4, 5]), xd.compose(xd.map(x=> x*x), xd.filter(x => x%2!==0 )))))
       .should.eql([1, 9, 25]);
@@ -182,11 +191,47 @@ describe('combine', ()=>{
 
 describe('combine two', ()=> {
   it('filterBy', done => go(function*(){
-    var c1 = sequentially(100, [true, false, true, false]);
-    var c2 = sequentially(50, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
-    (yield into([], filterBy(c2, c1))).should.eql([2, 3, 6, 7])
+    var c1 = sequentially(50, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    var c2 = sequentially(100, [true, false, true, false]);
+    (yield into([], filterBy(c1, c2))).should.eql([2, 3, 6, 7])
+    done();
+  }))
+
+  it('sampledBy', done => go(function*(){
+    
+    var c1 = sequentially(50, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    var c2 = sequentially(100, [0, 0, 0, 0]);
+    (yield into([], sampledBy(c1, c2))).should.eql([1, 3, 5, 7])
+    done();
+  }))
+
+  it('takeWhileBy', done => go(function*(){
+    
+    var c1 = sequentially(100, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    var c2 = sequentially(100, [true, true, false]);
+    (yield into([], takeWhileBy(c1, c2))).should.eql([1, 2, 3])
+    done();
+  }))
+
+  it('takeUntilBy', done => go(function*(){
+    var c1 = sequentially(100, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    var c2 = later(500, 1);
+    (yield into([], takeUntilBy(c1, c2))).should.eql([1, 2, 3, 4]);
+    done();
+  }))
+
+  it('bufferBy', done => go(function*(){
+    var c1 = sequentially(100, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    var c2 = sequentially(300, [1, 1, 1]);
+    (yield into([], bufferBy(c1, c2))).should.eql([[1,2], [3, 4, 5], [6, 7, 8], [9, 10, 11, 12, 13]]); // iknorite!
     done();
   }))
   
 })
+
+
+
+
+
+
 

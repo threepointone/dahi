@@ -1,27 +1,10 @@
 
-```js
-never()
-returns a channel that is already closed
-
-later(wait, value)
-returns a channel that produces a single value after wait milliseconds, then closes 
-
-
-interval(interval, value)
-sequentially
-fromPoll
-withInterval
-fromCallback
-Convert a function than accepts a callback as the first argument. Emits at most one value when callback is called, then ends. The fn function will be called at most once, when the first subscriber will be added to the stream.
-
-
-fromNodeCallback
-fromEvents
-stream
-
 ```
 
-from js-csp :
+js-csp cheatsheet:
+
+basic
+---
 
 conversion
 ---
@@ -45,3 +28,72 @@ mult
 pub-sub
 mix
 transducers
+
+not implemented
+---
+
+Create a property
+- constant
+- constantError
+- fromPromise
+Convert observables
+- toProperty
+- changes
+
+Main observable methods
+- onValue
+- offValue
+- onError
+- offError
+- onEnd
+- offEnd
+- onAny
+- offAny
+- log
+- offLog
+
+- valuesToErrors
+- errorsToValues
+- mapErrors
+- filterErrors
+- endOnError
+- skipValues
+- skipErrors
+- skipEnd
+- beforeEnd
+
+- slidingWindow
+
+ use transducers for the following 
+- map
+- filter
+- take
+- takeWhile
+- reduce
+- flatten
+
+
+- skip
+- skipWhile
+- skipDuplicates
+
+
+- withHandler
+- combine
+- merge
+- pool
+- repeat
+- flatMap
+- flatMapLatest
+- flatMapFirst
+- flatMapConcat
+- flatMapConcurLimit
+- skipWhileBy
+- skipUntilBy
+- bufferWhileBy
+- awaiting
+
+
+
+
+

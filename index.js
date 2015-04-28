@@ -94,25 +94,6 @@ export function fromEvents(emitter, event){
   return c;
 }
 
-// Create a property
-// - constant
-// - constantError
-// - fromPromise
-// Convert observables
-// - toProperty
-// - changes
-
-// Main observable methods
-// - onValue
-// - offValue
-// - onError
-// - offError
-// - onEnd
-// - offEnd
-// - onAny
-// - offAny
-// - log
-// - offLog
 
 export function log(ch, prefix=''){
   var c = chan();
@@ -128,21 +109,7 @@ export function log(ch, prefix=''){
 
 // todo - stoplog?
 
- // use transducers for the following 
-// - map
-// - filter
-// - take
-// - takeWhile
-// - reduce
-// - flatten
 
-
-
-
-
-// - skip
-// - skipWhile
-// - skipDuplicates
 
 export function diff(ch, fn, seed){
   var c = chan();
@@ -233,15 +200,26 @@ export function throttle(ch, wait){
   return c;
 }
 
-// - valuesToErrors
-// - errorsToValues
-// - mapErrors
-// - filterErrors
-// - endOnError
-// - skipValues
-// - skipErrors
-// - skipEnd
-// - beforeEnd
+
+// todo - don't flushOnEnd
+export function bufferWhile(ch, predicate, flushOnEnd=true){
+  var arr = [], c = chan();
+  go(function*(){
+    let el;
+    while((el = yield ch) !== csp.CLOSED){
+      arr.push(el)
+      if(!predicate(el)){
+        yield put(c, arr);
+        arr = [];
+      }      
+    }
+    if(flushOnEnd && arr.length>0){
+      yield put(c, arr);
+    }
+    c.close();
+  })
+  return c;
+}
 
 export function transduce(ch, xf, keepOpen=false, exHandler=()=>{}){
   var c = chan();  
@@ -249,9 +227,7 @@ export function transduce(ch, xf, keepOpen=false, exHandler=()=>{}){
   return c;
 }
 
-// withHandler
 
-// - combine
 export function zip(srcs){
   var c = chan();
   go(function*(){
@@ -276,7 +252,6 @@ export function zip(srcs){
   return c;
 }
 
-// - merge
 export function concat(srcs) {
   var c = chan();
   go(function*(){
@@ -304,13 +279,6 @@ export function concat(srcs) {
   })
   return c;
 }
-// - pool
-// - repeat
-// - flatMap
-// - flatMapLatest
-// - flatMapFirst
-// - flatMapConcat
-// - flatMapConcurLimit
 
 export function filterBy(ch, other, bool=false){
   var c = chan();
@@ -332,30 +300,84 @@ export function filterBy(ch, other, bool=false){
   return c;
 }
 
-// - filterBy
-// - sampledBy
-// - takeWhileBy
-// - skipWhileBy
-// - skipUntilBy
-// - takeUntilBy
-// - bufferBy
-// - bufferWhileBy
-// - awaiting
+export function sampledBy(ch, other){
+  var c = chan(), last;
+
+  go(function*(){
+    let el;
+    while((el = yield ch)!==csp.CLOSED){
+      last = el
+    }
+  });
+
+  go(function*(){
+    let el;
+    while((el = yield other)!==csp.CLOSED){   // samsher - 78997 22826
+      yield put(c, last)
+    }
+    c.close();
+  });
+  return c;
+}
+
+export function takeWhileBy(ch, other, bool=true){
+  var c = chan();
+
+  go(function*(){
+    let el;    
+    while(!!(el = yield other)){}
+    bool = false;
+  });
+
+  go(function*(){
+    let el;
+    while(((el = yield ch)!==csp.CLOSED) && bool){   // samsher - 78997 22826
+      yield put(c, el)
+    }
+    c.close();
+  });
+  return c;
+}
+
+export function takeUntilBy(ch, other, bool=true){
+  var c = chan();
+
+  go(function*(){
+    let el;    
+    yield other;
+    bool = false;
+  });
+
+  go(function*(){
+    let el;
+    while(((el = yield ch)!==csp.CLOSED) && bool){   // samsher - 78997 22826
+      yield put(c, el)
+    }
+    c.close();
+  });
+  return c;
+}
 
 
+export function bufferBy(ch, other){
+  var c = chan(), arr = [], done = false;
 
+  go(function*(){
+    let el;    
+    while((el = yield other)!==csp.CLOSED){
+      putAsync(c, arr);
+      arr = [];
+    }
+  });
 
+  go(function*(){
+    let el;
+    while(((el = yield ch)!==csp.CLOSED)){
+      arr.push(el)
+    }
+    (arr.length>0) && (yield put(c, arr));
+    c.close();
+  });
+  return c;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

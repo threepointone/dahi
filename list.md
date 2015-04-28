@@ -18,8 +18,7 @@ Main observable methods
 - offEnd
 - onAny
 - offAny
-- log
-- offLog
+*- offLog
 
 - valuesToErrors
 - errorsToValues
@@ -31,38 +30,37 @@ Main observable methods
 - skipEnd
 - beforeEnd
 
-- slidingWindow
+*- slidingWindow
 
- use transducers for the following 
-- map
-- filter
-- take
-- takeWhile
-- reduce
-- flatten
-
-
-- skip
-- skipWhile
-- skipDuplicates
+*- map
+*- filter
+*- take
+*- takeWhile
+*- reduce
+*- flatten
 
 
-- withHandler
-- combine
-- merge
-- pool
-- repeat
-- flatMap
-- flatMapLatest
-- flatMapFirst
-- flatMapConcat
-- flatMapConcurLimit
-- skipWhileBy
-- skipUntilBy
-- bufferWhileBy
-- awaiting
+*- skip
+*- skipWhile
+*- skipDuplicates
 
 
+*- withHandler
+*- combine
+*- merge
+*- pool
+*- repeat
+*- flatMap
+*- flatMapLatest
+*- flatMapFirst
+*- flatMapConcat
+*- flatMapConcurLimit
+*- skipWhileBy
+*- skipUntilBy
+*- bufferWhileBy
+*- awaiting
+
+* = will implement/howto
 
 
 ```

@@ -2,13 +2,11 @@ require('chai').should();
 // todo - check time diffs on a range, not just > (gt)
 import csp, {go, timeout, chan, putAsync} from 'js-csp';
 let {into, take, reduce, fromColl} = csp.operations;
-
 import xd from 'transducers.js';
-
-
 import { EventEmitter } from 'events';
 
 import {
+  // create
   later,
   sequentially,
   interval,
@@ -18,6 +16,7 @@ import {
   fromNodeCallback,
   fromEvents,
 
+  // modify
   diff,
   scan,
   delay,
@@ -26,9 +25,11 @@ import {
   bufferWhile,
   transduce,
 
+  // combine
   zip,
   concat,
 
+  // combine two
   filterBy,
   sampledBy,
   takeWhileBy,
@@ -85,22 +86,15 @@ describe('create', ()=>{
 
   it('fromCallback', done => go(function*(){
     var start = now();
-    (yield fromCallback(function(fn){
-          setTimeout(()=> fn(5), 200);
-        })).should.eql(5);
+    (yield fromCallback((fn)=> setTimeout(()=> fn(5), 200))).should.eql(5);
     ((now() - start) >= 200).should.be.ok;
     done();
   }))
 
   it('fromNodeCallback', done => go(function*(){
     var start = now();
-    (yield fromNodeCallback(function(fn){
-          setTimeout(()=> fn(new Error('some error')), 200);
-        })).should.be.an.Error;
-
-    (yield fromNodeCallback(function(fn){
-          setTimeout(()=> fn(null, 'value'), 200);
-        })).should.eql('value');
+    (yield fromNodeCallback(fn => setTimeout(()=> fn(new Error('some error')), 200))).should.be.an.Error;
+    (yield fromNodeCallback(fn => setTimeout(()=> fn(null, 'value'), 200))).should.eql('value');
     ((now() - start) > 200).should.be.ok;
     done();
 

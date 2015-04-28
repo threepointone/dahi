@@ -200,7 +200,6 @@ export function throttle(ch, wait){
 }
 
 
-// todo - don't flushOnEnd
 export function bufferWhile(ch, predicate, flushOnEnd=true){
   var arr = [], c = chan();
   go(function*(){
@@ -226,7 +225,7 @@ export function transduce(ch, xf, keepOpen=false, exHandler=()=>{}){
   return c;
 }
 
-
+// todo - combinator
 export function zip(srcs){
   var c = chan();
   go(function*(){
@@ -247,6 +246,7 @@ export function zip(srcs){
   return c;
 }
 
+// todo - combinator
 export function concat(srcs) {
   var c = chan();
   go(function*(){
@@ -287,14 +287,14 @@ export function filterBy(ch, other, bool=false){
 
   go(function*(){
     let el;
-    while((el = yield ch)!==csp.CLOSED){   // samsher - 78997 22826
+    while((el = yield ch)!==csp.CLOSED){  
       bool && (yield put(c, el))
     }
     c.close();
   });
   return c;
 }
-
+// todo - combinator
 export function sampledBy(ch, other){
   var c = chan(), last;
 
@@ -307,7 +307,7 @@ export function sampledBy(ch, other){
 
   go(function*(){
     let el;
-    while((el = yield other)!==csp.CLOSED){   // samsher - 78997 22826
+    while((el = yield other)!==csp.CLOSED){  
       yield put(c, last)
     }
     c.close();
@@ -326,7 +326,7 @@ export function takeWhileBy(ch, other, bool=true){
 
   go(function*(){
     let el;
-    while(((el = yield ch)!==csp.CLOSED) && bool){   // samsher - 78997 22826
+    while(((el = yield ch)!==csp.CLOSED) && bool){  
       yield put(c, el)
     }
     c.close();
@@ -345,7 +345,7 @@ export function takeUntilBy(ch, other, bool=true){
 
   go(function*(){
     let el;
-    while(((el = yield ch)!==csp.CLOSED) && bool){   // samsher - 78997 22826
+    while(((el = yield ch)!==csp.CLOSED) && bool){  
       yield put(c, el)
     }
     c.close();

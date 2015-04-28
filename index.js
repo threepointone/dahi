@@ -1,3 +1,5 @@
+// todo - accept chanopts
+
 import csp, {go, timeout, chan, putAsync} from 'js-csp';
 
 export function never(){
@@ -86,3 +88,29 @@ export function fromEvents(emitter, event){
 // - toProperty
 // - changes
 
+// Main observable methods
+// - onValue
+// - offValue
+// - onError
+// - offError
+// - onEnd
+// - offEnd
+// - onAny
+// - offAny
+// - log
+// - offLog
+
+// export function log(ch, prefix=''){
+//   var c = chan();
+//   go(function*(){
+//     while(true){
+//       var el = yield ch;
+//       console.log(prefix, el);
+//       putAsync(c, el);
+//     }
+//   })
+// }
+
+// export function(){
+
+// }

@@ -1,34 +1,3 @@
-
-```
-
-js-csp cheatsheet:
-
-basic
----
-
-conversion
----
-onto(ch, coll, keepOpen?)
-fromColl(coll)
-reduce(f, init, ch)
-into(coll, ch)
-
-flow control
----
-pipe(in, out, keepOpen?)
-split(predicate, ch, trueBufferOrN?, falseBufferOrN?)
-merge(chs, bufferOrN?)
-pipeline(to, xf, from, keepOpen?, exHandler?)
-pipelineAsync(n, to, af, from, keepOpen?)
-
-
-high level abstractions
----
-mult 
-pub-sub
-mix
-transducers
-
 not implemented
 ---
 
@@ -96,4 +65,55 @@ Main observable methods
 
 
 
+```
+
+js-csp cheatsheet:
+
+basic
+---
+chan(bufferOrN?, transducer?, exHandler?)
+
+buffers.fixed(n)
+buffers.dropping(n)
+buffers.sliding(n)
+buffers.promise()
+
+timeout(msecs)
+
+go(f*, args?)
+spawn(generator)
+
+yield put(ch, value)
+yield take(ch)
+yield alts(operations, options?)
+yield sleep(msecs)
+ch.close()
+
+csp.CLOSED
+csp.DEFAULT
+
+conversion
+---
+onto(ch, coll, keepOpen?)
+fromColl(coll)
+reduce(f, init, ch)
+into(coll, ch)
+
+flow control
+---
+pipe(in, out, keepOpen?)
+split(predicate, ch, trueBufferOrN?, falseBufferOrN?)
+merge(chs, bufferOrN?)
+pipeline(to, xf, from, keepOpen?, exHandler?)
+pipelineAsync(n, to, af, from, keepOpen?)
+
+
+high level abstractions
+---
+mult 
+pub-sub
+mix
+transducers
+
+```
 

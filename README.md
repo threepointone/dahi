@@ -42,16 +42,13 @@ returns a channel with every `event` from emitter
 
 modify a channel
 ---
-
-
-
-
-`transduce`
+`transduce(ch, xf)`
 
 `diff(channel, fn, seed)`
 On each value from `channel`, calls `fn` with the previous and current values as arguments. At first time, calls `fn` with `seed` and current value. Puts whatever `fn` returns. If no `seed` is provided, the first value will be used as a seed, and the result channel won't put the first value. If no `fn` function is provided, `(a, b) => [a, b]` will be used.
 
-`scan(ch, fn, seed)`
+`scan(channel, fn, seed)`
+On each value from `channel`, calls `fn`with the previous result returned by `fn` and the current value put on the `channel`. At first time, calls `fn` with seed as previous result. Puts forward whatever `fn` returns. If no `seed` is provided, the first value will be used as a `seed`.
 
 `delay(ch, wait)`
 

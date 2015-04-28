@@ -16,6 +16,7 @@
     "babelify": "^6.0.2",
     "browserify": "^9.0.8",
     "chai": "^2.3.0",
-    "mocha": "^2.2.4"
+    "mocha": "^2.2.4",
+    "transducers.js": "^0.3.2"
   }
 }

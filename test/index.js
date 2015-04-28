@@ -1,8 +1,12 @@
 require('chai').should();
 // todo - check time diffs on a range, not just > (gt)
 import csp, {go, timeout, chan, putAsync} from 'js-csp';
+let {into, take, reduce, fromColl} = csp.operations;
 
-import {EventEmitter} from 'events';
+import xd from 'transducers.js';
+
+
+import { EventEmitter } from 'events';
 
 import {
   later,
@@ -12,10 +16,25 @@ import {
   withInterval,
   fromCallback,
   fromNodeCallback,
-  fromEvents
+  fromEvents,
+
+  diff,
+  scan,
+  delay,
+  throttle,
+  debounce,
+  transduce,
+
+  zip,
+  concat,
+
+
+  filterBy
 } from '../index.js';
 
-let {into, take, reduce} = csp.operations;
+function times(n, fn){
+  for(var i =0; i<n; i++) fn(i);
+}
 
 function now(){
   return new Date().getTime()
@@ -90,9 +109,84 @@ describe('create', ()=>{
       emitter.emit('beep', 1);
     }
     (yield into([], take(5, ch))).map(arr => arr[0]).should.eql([1, 1, 1, 1, 1]);
+    ch.close();
     done();    
+  }))  
+});
+
+describe('modify', ()=>{
+  it('diff', done => go(function*(){  
+    (yield into([], diff(fromColl([1, 2, 3, 4, 5]), (prev, next) => next - prev, 0)))
+      .should.eql([1, 1, 1, 1, 1]);
+    done();
+  }));
+
+  it('scan', done => go(function*(){
+    var start = now();
+    (yield into([], scan(fromColl([1, 2, 3, 4, 5]), (prev, next) => next + prev, 0)))
+      .should.eql([1, 3, 6, 10, 15]);
+    done();
   }))
 
+  it('delay', done => go(function*(){
+    var start = now();
+    (yield into ([], delay(sequentially(100, [1, 2, 3, 4, 5]), 200))).should.eql([1, 2, 3, 4, 5]);
+    ((now() - start) > 700).should.be.ok;
+    done();
+  }));
+
+  it('debounce', done => go(function*(){
+    var start = now();
+    var c = chan(), tc = debounce(c, 20);
+    times(10, i => putAsync(c, i));
+    yield timeout(300);
+    times(10, i => putAsync(c, i));    
+    (yield into([], take(2, tc))).should.eql([9, 9]);    
+    c.close();
+    done();
+  }))
+
+  it('throttle', done => go(function*(){
+    var start = now();
+    (yield into([], take(3, throttle(sequentially(50, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), 100))))
+      .should.eql([2, 4, 6]);
+    done();
+  }))
+
+  it('transduce', done => go(function*(){
+    (yield into([], transduce(sequentially(100, [1, 2, 3, 4, 5]), xd.compose(xd.map(x=> x*x), xd.filter(x => x%2!==0 )))))
+      .should.eql([1, 9, 25]);
+    done();
+  }))
+
+})
+
+describe('combine', ()=>{
+  it('zip', done => go(function*(){
+    var c1 = sequentially(100, [1, 2, 3, 4, 5]);
+    var c2 = sequentially(200, ['a', 'b', 'c']);
+    var c3 = sequentially(300, ['Ω', '∫']);
+    (yield into([], zip([c1, c2, c3]))).should.eql([ [1, 'a', 'Ω'], [2, 'b','∫']]);
+    done();
+  }))
+
+  it('concat', done => go(function*(){
+    var c1 = sequentially(50, [1, 2, 3, 4, 5]);
+    var c2 = sequentially(100, ['a', 'b', 'c']);
+    var c3 = sequentially(100, ['Ω', '∫']);
+    (yield into([], concat([c1, c2, c3]))).should.eql([1, 2, 3, 4, 5, 'a', 'b', 'c', 'Ω', '∫'])
+    done();
+  }))  
+
+})
+
+describe('combine two', ()=> {
+  it('filterBy', done => go(function*(){
+    var c1 = sequentially(100, [true, false, true, false]);
+    var c2 = sequentially(50, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    (yield into([], filterBy(c2, c1))).should.eql([2, 3, 6, 7])
+    done();
+  }))
   
-});
+})
 

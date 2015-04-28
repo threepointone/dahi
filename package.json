@@ -1,0 +1,21 @@
+{
+  "name": "dahi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-csp": "^0.4.0"
+  },
+  "devDependencies": {
+    "babel": "^5.1.13",
+    "babelify": "^6.0.2",
+    "browserify": "^9.0.8",
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4"
+  }
+}

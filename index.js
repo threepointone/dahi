@@ -70,7 +70,6 @@ export function fromCallback(fn){
       yield put(c, value);
       c.close();  
     })
-    
   })
   return c;
 }
@@ -237,12 +236,8 @@ export function zip(srcs){
       for (let src of srcs){
         if(!done){
           var el = yield src;
-          if(el === csp.CLOSED){
-            done = true  
-          }
-          else{
-            arr.push(el);  
-          }  
+          if(el === csp.CLOSED) done = true;
+          else arr.push(el);
         }              
       }
       putAsync(c, arr);

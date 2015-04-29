@@ -123,6 +123,19 @@ export function takeWhile(ch, fn){
   return transduce(ch, xd.takeWhile(fn))  
 }
 
+export function last(ch){
+  var c = chan();
+  go(function*(){
+    var el, last;
+    while((el = yield ch)!== csp.CLOSED){
+      last = el;
+    }
+    yield put(c, last);
+    c.close();
+  })
+  return c;
+}
+
 export function flatten(ch, fn){
   var c = chan();
   go(function*(){
@@ -137,15 +150,7 @@ export function flatten(ch, fn){
 }
 
 export function skip(ch, n){
-   // return transduce(ch, xd.drop(n)); // sigh, doesn't work
-   var c = chan();
-   go(function*(){
-    for(var i=0; i< n;i++){
-      yield ch;
-    }
-    pipeline(c, xd.map(x=> x), ch)
-   })
-   return c;
+   return transduce(ch, xd.drop(n)); // sigh, doesn't work
 }
 
 export function skipWhile(ch, fn){
@@ -153,19 +158,7 @@ export function skipWhile(ch, fn){
 }
 
 export function skipDuplicates(ch){
-  // return transduce(ch, xd.dedupe()); // sigh, doesn't work
-  var c = chan();
-  go(function*(){
-    var el, last = {};
-    while(((el = yield ch)!=csp.CLOSED)){
-      if(el!=last){
-        last = el;
-        yield put(c, last)
-      }
-    }
-    c.close();
-  })
-  return c;
+  return transduce(ch, xd.dedupe());  
 }
 
 
@@ -278,9 +271,9 @@ export function bufferWhile(ch, predicate, flushOnEnd=true){
   return c;
 }
 
-export function transduce(ch, xf, keepOpen=false, exHandler=()=>{}){
-  var c = chan();  
-  pipeline(c, xf, ch, keepOpen, exHandler)
+export function transduce(ch, xf, bufferOrN=1){
+  var c = chan(bufferOrN, xf);  
+  pipe(ch, c);
   return c;
 }
 

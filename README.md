@@ -48,14 +48,21 @@ modify a channel
 ---
 
 `map(channel, fn)`
+applies `fn` to every value in `channel`
 
-`filter(channel, fn)`
+`filter(channel, predicate)`
+applies `predicate` to every value in `channel`, and only allows truthy values to be passed on
 
-`takeWhile(channel, fn)`
+`takeWhile(channel, predicate)`
+puts values from `channel` until `predicate` applied to a value returns false. Ends when `predicate` returns false.
 
 `flatten(channel)`
 
+`last(channel)`
+returns a channel with only the last value from `channel`
+
 `skip(channel, n)`
+drops the first `n` elements from `channel` and returns a channel with the rest
 
 `skipWhile(channel, fn)`
 

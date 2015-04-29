@@ -21,6 +21,7 @@ import {
   filter,
   takeWhile,
   flatten,
+  last,
   skip,
   skipWhile,
   skipDuplicates,
@@ -141,6 +142,12 @@ describe('modify', ()=>{
   it('flatten', done => go(function*(){
     (yield into([], flatten(sequentially(50, [[1], [], [2, 3]]))))
       .should.eql([1, 2, 3]);
+    done();
+  }))
+
+  it('last', done => go(function*(){
+    (yield into([], last(sequentially(50, [1, 2, 3, 4]))))
+      .should.eql([4]);
     done();
   }))
 

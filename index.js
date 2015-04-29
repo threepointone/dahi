@@ -91,6 +91,7 @@ export function fromEvents(emitter, event){
   var c = chan();
   var fn = (...args) => putAsync(c, args)
   emitter.on(event, fn);  
+  c.off = ()=> emitter.off(fn)
   return c;
 }
 

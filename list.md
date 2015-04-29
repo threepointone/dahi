@@ -49,7 +49,7 @@ Main observable methods
 - bufferWhileBy *
 - awaiting *
 
-* = will implement/howto
+ * = will implement/howto
 
 
 ```

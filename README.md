@@ -57,6 +57,7 @@ applies `predicate` to every value in `channel`, and only allows truthy values t
 puts values from `channel` until `predicate` applied to a value returns false. Ends when `predicate` returns false.
 
 `flatten(channel)`
+For this method it's expected that the `channel` 'emits' arrays. The result channel will then 'emit' each element of these arrays.
 
 `last(channel)`
 returns a channel with only the last value from `channel`
@@ -64,9 +65,11 @@ returns a channel with only the last value from `channel`
 `skip(channel, n)`
 drops the first `n` elements from `channel` and returns a channel with the rest
 
-`skipWhile(channel, fn)`
+`skipWhile(channel, predicate)`
+Skips values from `channel` until the `predicate` applied to a value returns false, then stops applying `predicate` to values and 'emits' all of them.
 
 `skipDuplicates(channel)`
+Skips duplicate values using === for comparison.
 
 `transduce(channel, xf)`
 applies the transducer `xf` to every value in `channel`

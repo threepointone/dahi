@@ -151,13 +151,14 @@ export function flatten(ch, fn){
 }
 
 export function skip(ch, n){
-   return transduce(ch, xd.drop(n)); // sigh, doesn't work
+   return transduce(ch, xd.drop(n)); 
 }
 
 export function skipWhile(ch, fn){
   return transduce(ch, xd.dropWhile(fn));  
 }
 
+// todo - comparator fn
 export function skipDuplicates(ch){
   return transduce(ch, xd.dedupe());  
 }

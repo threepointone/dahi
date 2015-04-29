@@ -123,10 +123,9 @@ logs every put onto the channel
 open issues 
 ---
 - unfinished functions - list.md
-- how to unbind event listener when `fromEvents()` closes
-- how to stop intervals on `*interval*/sequentially`
 - accept custom chanopts per function
 - debounce immediate: true
+- combine combinators
 - audit putAsync usage
 - error handling story
 - fromPromise vs promiseChan

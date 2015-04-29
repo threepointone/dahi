@@ -25,12 +25,13 @@ export function later(wait, value){
   return c;
 }
 
-// todo - clearInterval?
 export function interval(interval, value){
   var c = chan();
-  setInterval(()=>{
+  var intval = setInterval(()=>{
     putAsync(c, value);
   }, interval);
+
+  c.stop = ()=> clearInterval(intval)
   return c;  
 }
 
@@ -46,21 +47,21 @@ export function sequentially(interval, values){
   return c;
 }
 
-// todo - clearInterval? 
 export function fromPoll(interval, fn){
   var c = chan();
-  setInterval(()=>{
+  var intval = setInterval(()=>{
     putAsync(c, fn());
   }, interval);
+  c.stop = ()=> clearInterval(intval)
   return c;  
 }
 
-// todo - clearInterval? 
 export function withInterval(interval, handler){
   var c = chan();
-  setInterval(()=>{
+  var intval = setInterval(()=>{
     handler(c);
   }, interval);
+  c.stop = ()=> clearInterval(intval)
   return c;
 }
 
@@ -86,12 +87,11 @@ export function fromNodeCallback(fn){
   return c;
 }
 
-// todo - how to unbind?
 export function fromEvents(emitter, event){
   var c = chan();
   var fn = (...args) => putAsync(c, args)
   emitter.on(event, fn);  
-  c.off = ()=> emitter.off(fn)
+  c.stop = ()=> emitter.off(fn)
   return c;
 }
 

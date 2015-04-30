@@ -1,6 +1,6 @@
 {
   "name": "dahi",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "a port of kefir(frp) for js-csp",
   "main": "index.js",
   "scripts": {

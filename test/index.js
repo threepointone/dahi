@@ -63,8 +63,10 @@ describe('create', ()=>{
 
   it('interval', done => go(function*(){
     var start = now();
-    (yield reduce((a,b)=> a+b, 0, take(5, interval(200, 5)))).should.eql(25);
+    let intval = interval(200, 5);
+    (yield reduce((a,b)=> a+b, 0, take(5, intval))).should.eql(25);    
     ((now() - start) > 1000).should.be.ok;
+    intval.stop();
     done();
   }))
 
@@ -79,16 +81,18 @@ describe('create', ()=>{
 
   it('fromPoll', done => go(function*(){
     var start = now();
-    var i = 0;
-    (yield reduce((a,b) => a+b, 0, take(5, fromPoll(200, ()=> i++)))).should.eql(10);
+    var i = 0, fp = fromPoll(200, ()=> i++);
+    (yield reduce((a,b) => a+b, 0, take(5, fp))).should.eql(10);
+    fp.stop();
     ((now() - start) > 1000).should.be.ok;
     done();
   }))
 
   it('withInterval', done => go(function*(){
-    var start = now();
-    (yield into([], take(5, withInterval(200, ch => putAsync(ch, 5))))).should.eql([5, 5, 5, 5, 5]);
+    var start = now(), withInt = withInterval(200, ch => putAsync(ch, 5));
+    (yield into([], take(5, withInt))).should.eql([5, 5, 5, 5, 5]);    
     ((now() - start) > 1000).should.be.ok;
+    withInt.stop();
     done();
   }))
 
@@ -115,7 +119,7 @@ describe('create', ()=>{
       emitter.emit('beep', 1);
     }
     (yield into([], take(5, ch))).map(arr => arr[0]).should.eql([1, 1, 1, 1, 1]);
-    ch.close();
+    ch.stop();
     done();    
   }))  
 });

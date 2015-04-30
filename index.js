@@ -8,6 +8,8 @@ import xd from 'transducers.js';
 
 let {pipelineAsync, pipeline} = csp.operations;
 
+//  CREATE 
+
 export function never(){
   var c = chan();
   c.close();
@@ -31,7 +33,10 @@ export function interval(interval, value){
     putAsync(c, value);
   }, interval);
 
-  c.stop = ()=> clearInterval(intval)
+  c.stop = ()=> {
+    clearInterval(intval)
+    c.close();
+  }
   return c;  
 }
 
@@ -52,7 +57,10 @@ export function fromPoll(interval, fn){
   var intval = setInterval(()=>{
     putAsync(c, fn());
   }, interval);
-  c.stop = ()=> clearInterval(intval)
+  c.stop = ()=> {
+    clearInterval(intval);
+    c.close();
+  }
   return c;  
 }
 
@@ -61,7 +69,10 @@ export function withInterval(interval, handler){
   var intval = setInterval(()=>{
     handler(c);
   }, interval);
-  c.stop = ()=> clearInterval(intval)
+  c.stop = ()=> {
+    clearInterval(intval);
+    c.close();
+  }
   return c;
 }
 
@@ -90,8 +101,11 @@ export function fromNodeCallback(fn){
 export function fromEvents(emitter, event){
   var c = chan();
   var fn = (...args) => putAsync(c, args)
-  emitter.on(event, fn);  
-  c.stop = ()=> emitter.off(fn)
+  emitter.on(event, fn)
+  c.stop = ()=> {
+    emitter.removeListener(event, fn);
+    c.close();
+  }
   return c;
 }
 

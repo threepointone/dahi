@@ -132,3 +132,4 @@ open issues
 - audit putAsync usage
 - error handling story
 - fromPromise vs promiseChan
+- close from producer side on infinite channels 

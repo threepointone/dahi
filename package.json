@@ -13,14 +13,14 @@
   "author": "Sunil Pai <threepointone@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "js-csp": "^0.4.0"
+    "js-csp": "^0.4.0",
+    "transducers.js": "^0.3.2"
   },
   "devDependencies": {
     "babel": "^5.1.13",
     "babelify": "^6.0.2",
     "browserify": "^9.0.8",
     "chai": "^2.3.0",
-    "mocha": "^2.2.4",
-    "transducers.js": "^0.3.2"
+    "mocha": "^2.2.4"
   }
 }

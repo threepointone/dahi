@@ -13,7 +13,7 @@
   "author": "Sunil Pai <threepointone@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "js-csp": "^0.4.0",
+    "js-csp": "^0.4.1",
     "transducers.js": "^0.3.2"
   },
   "devDependencies": {

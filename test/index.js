@@ -167,7 +167,7 @@ describe('modify', ()=>{
   }));
 
   it('skipWhile', done => go(function*(){
-    (yield into([], skipWhile(sequentially(50, [1, 2, 3, 4, 5]), x=> x < 3)))
+    (yield into([], skipWhile(sequentially(50, [1, 2, 3, 4, 5]), x => x < 3)))
       .should.eql([3, 4, 5]);
     done();
   }));
@@ -287,7 +287,8 @@ describe('chaining', () => {
     let res = yield _(sequentially(100, [1, 2, 3, 4]))
       .scan((a, b) => a + b, 0)
       .map(x => x * 2)
-      .into([]).val();
+      .into([])
+      .val();
     res.should.eql([2, 6, 12, 20]);
 
     done();

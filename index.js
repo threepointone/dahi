@@ -30,9 +30,7 @@ export function chain(o){
 
 
 // some basics
-$(function reduce(ch, f, init){
-  return csp.operations.reduce(f, init, ch);
-}, function into(ch, coll){
+$(function into(ch, coll){
   return csp.operations.into(coll, ch);
 });
 

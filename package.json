@@ -4,7 +4,8 @@
   "description": "a port of kefir(frp) for js-csp",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "cover": "istanbul cover ./node_modules/.bin/_mocha"
   },
   "repository": {
     "url": "https://github.com/threepointone/dahi",
@@ -21,6 +22,7 @@
     "babelify": "^6.1.2",
     "browserify": "^9.0.8",
     "chai": "^2.3.0",
+    "istanbul": "^0.3.14",
     "mocha": "^2.2.5"
   }
 }

@@ -8,7 +8,7 @@ import xd from 'transducers.js';
 
 let {pipelineAsync, pipeline} = csp.operations;
 
-//  CREATE 
+//  CREATE
 
 export function never(){
   var c = chan();
@@ -21,58 +21,58 @@ export function later(wait, value){
   setTimeout(()=>{
     go(function*(){
       yield put(c, value);
-      c.close()
-    })
+      c.close();
+    });
   }, wait);
   return c;
 }
 
-export function interval(interval, value){
+export function interval(duration, value){
   var c = chan();
   var intval = setInterval(()=>{
     putAsync(c, value);
-  }, interval);
+  }, duration);
 
   c.stop = ()=> {
-    clearInterval(intval)
+    clearInterval(intval);
     c.close();
-  }
-  return c;  
-}
-
-export function sequentially(interval, values){
-  var c = chan();
-  go(function*(){
-    for(let value of values){
-      yield timeout(interval);
-      putAsync(c, value);
-    }
-    c.close();
-  })
+  };
   return c;
 }
 
-export function fromPoll(interval, fn){
+export function sequentially(duration, values){
+  var c = chan();
+  go(function*(){
+    for(let value of values){
+      yield timeout(duration);
+      putAsync(c, value);
+    }
+    c.close();
+  });
+  return c;
+}
+
+export function fromPoll(duration, fn){
   var c = chan();
   var intval = setInterval(()=>{
     putAsync(c, fn());
-  }, interval);
+  }, duration);
   c.stop = ()=> {
     clearInterval(intval);
     c.close();
-  }
-  return c;  
+  };
+  return c;
 }
 
-export function withInterval(interval, handler){
+export function withInterval(duration, handler){
   var c = chan();
   var intval = setInterval(()=>{
     handler(c);
-  }, interval);
+  }, duration);
   c.stop = ()=> {
     clearInterval(intval);
     c.close();
-  }
+  };
   return c;
 }
 
@@ -81,9 +81,9 @@ export function fromCallback(fn){
   fn(function(value){
     go(function*(){
       yield put(c, value);
-      c.close();  
-    })
-  })
+      c.close();
+    });
+  });
   return c;
 }
 
@@ -92,20 +92,20 @@ export function fromNodeCallback(fn){
   fn(function(err, res){
     go(function*(){
       yield put(c, err || res);
-      c.close();  
-    })
-  })
+      c.close();
+    });
+  });
   return c;
 }
 
 export function fromEvents(emitter, event){
   var c = chan();
-  var fn = (...args) => putAsync(c, args)
-  emitter.on(event, fn)
+  var fn = (...args) => putAsync(c, args);
+  emitter.on(event, fn);
   c.stop = ()=> {
     emitter.removeListener(event, fn);
     c.close();
-  }
+  };
   return c;
 }
 
@@ -114,12 +114,19 @@ export function log(ch, prefix=''){
   var c = chan();
   go(function*(){
     var el;
-    while((el = yield ch)!== csp.CLOSED){
+    while((el = yield ch) !== csp.CLOSED){
       console.log(prefix, el);
       yield put(c, el);
     }
     c.close();
-  })
+  });
+}
+
+
+export function transduce(ch, xf, bufferOrN=1){
+  var c = chan(bufferOrN, xf);
+  pipe(ch, c);
+  return c;
 }
 
 // todo - stoplog?
@@ -131,23 +138,23 @@ export function map(ch, fn){
 }
 
 export function filter(ch, fn){
- return transduce(ch, xd.filter(fn)); 
+ return transduce(ch, xd.filter(fn));
 }
 
 export function takeWhile(ch, fn){
-  return transduce(ch, xd.takeWhile(fn))  
+  return transduce(ch, xd.takeWhile(fn));
 }
 
 export function last(ch){
   var c = chan();
   go(function*(){
-    var el, last;
-    while((el = yield ch)!== csp.CLOSED){
-      last = el;
+    var el, final;
+    while((el = yield ch) !== csp.CLOSED){
+      final = el;
     }
-    yield put(c, last);
+    yield put(c, final);
     c.close();
-  })
+  });
   return c;
 }
 
@@ -155,42 +162,44 @@ export function flatten(ch, fn){
   var c = chan();
   go(function*(){
     var el;
-    while(((el = yield ch)!=csp.CLOSED)){
+    while(((el = yield ch) !== csp.CLOSED)){
       for(let e of el)
-        yield put(c, e);      
+        yield put(c, e);
     }
     c.close();
-  })
+  });
   return c;
 }
 
+
+
 export function skip(ch, n){
-   return transduce(ch, xd.drop(n)); 
+   return transduce(ch, xd.drop(n));
 }
 
 export function skipWhile(ch, fn){
-  return transduce(ch, xd.dropWhile(fn));  
+  return transduce(ch, xd.dropWhile(fn));
 }
 
 // todo - comparator fn
 export function skipDuplicates(ch){
-  return transduce(ch, xd.dedupe());  
+  return transduce(ch, xd.dedupe());
 }
 
 
-export function diff(ch, fn = (a,b) => [a,b], seed){
+export function diff(ch, fn = (a, b) => [a, b], seed){
   var c = chan();
   go(function*(){
     if(typeof seed === 'undefined'){
       seed = yield ch;
     }
-    var last = seed, current;
-    while ((current = yield(ch))!=csp.CLOSED){
-      yield put(c, fn(last, current));
-      last = current;
+    var final = seed, current;
+    while ((current = yield(ch)) !== csp.CLOSED){
+      yield put(c, fn(final, current));
+      final = current;
     }
     c.close();
-  })
+  });
   return c;
 }
 
@@ -201,21 +210,21 @@ export function scan(ch, fn, seed){
     if(typeof seed === 'undefined'){
       seed = yield ch;
     }
-    var last = seed, current;
-    while ((current = yield(ch))!=csp.CLOSED){      
-      yield put(c, last = fn(last, current));      
+    var final = seed, current;
+    while ((current = yield(ch)) !== csp.CLOSED){
+      yield put(c, final = fn(final, current));
     }
     c.close();
-  })
+  });
   return c;
 }
 
 export function delay(ch, wait){
   var c = chan();
-  pipelineAsync(10, c, 
-    (val, ch) => setTimeout(()=>go(function*(){ 
-      yield put(ch, val); 
-      ch.close(); 
+  pipelineAsync(10, c,
+    (val, sink) => setTimeout(()=>go(function*(){
+      yield put(sink, val);
+      sink.close();
     }), wait), ch);
   return c;
 }
@@ -226,38 +235,38 @@ export function delay(ch, wait){
 export function debounce(ch, wait){
   var c = chan();
   go(function*(){
-    var last = yield ch;
-    while(last !== csp.CLOSED){
+    var final = yield ch;
+    while(final !== csp.CLOSED){
       var res = yield alts([timeout(wait), ch]);
-      if(res.channel!==ch){
-        putAsync(c, last)
+      if(res.channel !== ch){
+        putAsync(c, final);
       }
       else{
-        last = res.value;
+        final = res.value;
       }
     }
-    c.close();  
-  })
-  
+    c.close();
+  });
+
   return c;
 }
 
 export function throttle(ch, wait){
-  var c = chan(), t;
+  var c = chan();
 
   go(function*(){
-    var last = (yield ch), t = timeout(wait);
-    while(last !== csp.CLOSED){
+    var final = (yield ch), t = timeout(wait);
+    while(final !== csp.CLOSED){
       t = t || timeout(wait);
       var res = yield alts([ch, t]);
-      
+
       if(res.channel === ch){
-        last = res.value;
+        final = res.value;
       }
-      else if(res.channel === t){        
-        if(last !== undefined){
-          putAsync(c, last);
-          last = undefined;
+      else if(res.channel === t){
+        if(final !== undefined){
+          putAsync(c, final);
+          final = undefined;
         }
         t = undefined;
       }
@@ -273,25 +282,20 @@ export function bufferWhile(ch, predicate, flushOnEnd=true){
   go(function*(){
     let el;
     while((el = yield ch) !== csp.CLOSED){
-      arr.push(el)
+      arr.push(el);
       if(!predicate(el)){
         yield put(c, arr);
         arr = [];
-      }      
+      }
     }
-    if(flushOnEnd && arr.length>0){
+    if(flushOnEnd && arr.length > 0){
       yield put(c, arr);
     }
     c.close();
-  })
+  });
   return c;
 }
 
-export function transduce(ch, xf, bufferOrN=1){
-  var c = chan(bufferOrN, xf);  
-  pipe(ch, c);
-  return c;
-}
 
 // COMBINE
 
@@ -305,13 +309,17 @@ export function zip(srcs){
       for (let src of srcs){
         if(!done){
           var el = yield src;
-          if(el === csp.CLOSED) done = true;
-          else arr.push(el);
-        }              
+          if(el === csp.CLOSED) {
+            done = true;
+          }
+          else {
+            arr.push(el);
+          }
+        }
       }
       putAsync(c, arr);
     }
-    c.close();      
+    c.close();
   });
   return c;
 }
@@ -325,23 +333,23 @@ export function concat(srcs) {
     var outs = srcs.map(src => {
       let out = chan();
       go(function*(){
-        let el;  
-        while((el = yield src)!== csp.CLOSED){
+        let el;
+        while((el = yield src) !== csp.CLOSED){
           putAsync(out, el);
-        }     
+        }
         putAsync(out, sentinel);
-      })
+      });
       return out;
-    })
+    });
     for(let out of outs){
       let el;
-      while((el = yield out)!== sentinel){
+      while((el = yield out) !== sentinel){
         yield put(c, el);
-      }        
+      }
     }
     outs.forEach(out => out.close());
-    c.close();        
-  })
+    c.close();
+  });
   return c;
 }
 
@@ -350,15 +358,17 @@ export function filterBy(ch, other, bool=false){
 
   go(function*(){
     let el;
-    while((el = yield other)!==csp.CLOSED){
-      bool = !!el
+    while((el = yield other) !== csp.CLOSED){
+      bool = !!el;
     }
   });
 
   go(function*(){
     let el;
-    while((el = yield ch)!==csp.CLOSED){  
-      bool && (yield put(c, el))
+    while((el = yield ch) !== csp.CLOSED){
+      if(bool) {
+        (yield put(c, el));
+      }
     }
     c.close();
   });
@@ -366,19 +376,19 @@ export function filterBy(ch, other, bool=false){
 }
 // todo - combinator
 export function sampledBy(ch, other){
-  var c = chan(), last;
+  var c = chan(), final;
 
   go(function*(){
     let el;
-    while((el = yield ch)!==csp.CLOSED){
-      last = el
+    while((el = yield ch) !== csp.CLOSED){
+      final = el;
     }
   });
 
   go(function*(){
     let el;
-    while((el = yield other)!==csp.CLOSED){  
-      yield put(c, last)
+    while((el = yield other) !== csp.CLOSED){
+      yield put(c, final);
     }
     c.close();
   });
@@ -389,15 +399,15 @@ export function takeWhileBy(ch, other, bool=true){
   var c = chan();
 
   go(function*(){
-    let el;    
+    let el;
     while(!!(el = yield other)){}
     bool = false;
   });
 
   go(function*(){
     let el;
-    while(((el = yield ch)!==csp.CLOSED) && bool){  
-      yield put(c, el)
+    while(((el = yield ch) !== csp.CLOSED) && bool){
+      yield put(c, el);
     }
     c.close();
   });
@@ -408,15 +418,15 @@ export function takeUntilBy(ch, other, bool=true){
   var c = chan();
 
   go(function*(){
-    let el;    
+    let el;
     yield other;
     bool = false;
   });
 
   go(function*(){
     let el;
-    while(((el = yield ch)!==csp.CLOSED) && bool){  
-      yield put(c, el)
+    while(((el = yield ch) !== csp.CLOSED) && bool){
+      yield put(c, el);
     }
     c.close();
   });
@@ -428,8 +438,8 @@ export function bufferBy(ch, other){
   var c = chan(), arr = [], done = false;
 
   go(function*(){
-    let el;    
-    while((el = yield other)!==csp.CLOSED){
+    let el;
+    while((el = yield other) !== csp.CLOSED){
       putAsync(c, arr);
       arr = [];
     }
@@ -437,10 +447,12 @@ export function bufferBy(ch, other){
 
   go(function*(){
     let el;
-    while(((el = yield ch)!==csp.CLOSED)){
-      arr.push(el)
+    while(((el = yield ch) !== csp.CLOSED)){
+      arr.push(el);
     }
-    (arr.length>0) && (yield put(c, arr));
+    if(arr.length > 0) {
+      (yield put(c, arr));
+    }
     c.close();
   });
   return c;

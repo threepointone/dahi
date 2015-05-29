@@ -16,7 +16,7 @@ create a channel
 ---
 
 `never()`
-creates a channel that's already closed 
+creates a channel that's already closed
 
 `later(wait)`
 creates a channel that produces a single `value` after `wait` milliseconds, and then closes.
@@ -37,7 +37,7 @@ creates a channel that calls the given `handler` function, with the given `inter
 convert a function than accepts a `callback` as the first argument, to a channel. Emits at most one value when `callback` is called, then ends.
 
 `fromNodeCallback(callback)`
-like `fromCallback`, but accepts a node style callback which gets arguments in the form `(err, res)`. 
+like `fromCallback`, but accepts a node style callback which gets arguments in the form `(err, res)`.
 
 
 `fromEvents(emitter, event)`
@@ -119,11 +119,11 @@ Similar to `takeWhileBy`, but instead of waiting for the first falsey value from
 `bufferBy(chan, otherChan)`
 Buffers all values from `chan`, and flushes the buffer on each value from `otherChan`. Also flushes the buffer before end, but you can disable that by passing `flushOnEnd` as `false`.
 
-`log()`
+`log(chan)`
 logs every put onto the channel
 
 
-open issues 
+open issues
 ---
 - unfinished functions - list.md
 - accept custom chanopts per function
@@ -132,4 +132,4 @@ open issues
 - audit putAsync usage
 - error handling story
 - fromPromise vs promiseChan
-- close from producer side on infinite channels 
+- close from producer side on infinite channels

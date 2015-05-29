@@ -1,12 +1,40 @@
 // todo - accept chanopts
 // todo - try to eliminate putAsync
-"use strict";
 
 import csp, {go, timeout, chan, putAsync, alts, put} from 'js-csp';
-let {into, take, pipe} = csp.operations;
+let {pipe} = csp.operations;
 import xd from 'transducers.js';
 
-let {pipelineAsync, pipeline} = csp.operations;
+let {pipelineAsync} = csp.operations;
+
+// chaining helpers
+class Chain{
+  constructor(o){
+    this.o = o;
+  }
+  val(){
+    return this.o;
+  }
+}
+
+function $(...fns){
+  fns.forEach(fn => Object.assign(Chain.prototype, {[fn.name]: function(...args) {
+    this.o = fn(this.o, ...args);
+    return this;
+  }}));
+}
+
+export function chain(o){
+  return new Chain(o);
+}
+
+
+// some basics
+$(function reduce(ch, f, init){
+  return csp.operations.reduce(f, init, ch);
+}, function into(ch, coll){
+  return csp.operations.into(coll, ch);
+});
 
 //  CREATE
 
@@ -102,7 +130,7 @@ export function fromEvents(emitter, event){
   var c = chan();
   var fn = (...args) => putAsync(c, args);
   emitter.on(event, fn);
-  c.stop = ()=> {
+  c.stop = () => {
     emitter.removeListener(event, fn);
     c.close();
   };
@@ -120,7 +148,9 @@ export function log(ch, prefix=''){
     }
     c.close();
   });
+  return c;
 }
+
 
 
 export function transduce(ch, xf, bufferOrN=1){
@@ -128,6 +158,8 @@ export function transduce(ch, xf, bufferOrN=1){
   pipe(ch, c);
   return c;
 }
+
+$(log, transduce);
 
 // todo - stoplog?
 
@@ -171,7 +203,7 @@ export function flatten(ch, fn){
   return c;
 }
 
-
+$(map, filter, takeWhile, last, flatten);
 
 export function skip(ch, n){
    return transduce(ch, xd.drop(n));
@@ -185,6 +217,8 @@ export function skipWhile(ch, fn){
 export function skipDuplicates(ch){
   return transduce(ch, xd.dedupe());
 }
+
+$(skip, skipWhile, skipDuplicates);
 
 
 export function diff(ch, fn = (a, b) => [a, b], seed){
@@ -218,6 +252,8 @@ export function scan(ch, fn, seed){
   });
   return c;
 }
+
+$(diff, scan);
 
 export function delay(ch, wait){
   var c = chan();
@@ -277,6 +313,8 @@ export function throttle(ch, wait){
 }
 
 
+
+
 export function bufferWhile(ch, predicate, flushOnEnd=true){
   var arr = [], c = chan();
   go(function*(){
@@ -296,11 +334,12 @@ export function bufferWhile(ch, predicate, flushOnEnd=true){
   return c;
 }
 
+$(delay, debounce, throttle, bufferWhile);
 
 // COMBINE
 
 // todo - combinator
-export function zip(srcs){
+export function zip(...srcs){
   var c = chan();
   go(function*(){
     var done = false;
@@ -325,7 +364,7 @@ export function zip(srcs){
 }
 
 // todo - combinator
-export function concat(srcs) {
+export function concat(...srcs) {
   var c = chan();
   go(function*(){
     // we start the takes early or they might be lost on closed channels
@@ -352,6 +391,8 @@ export function concat(srcs) {
   });
   return c;
 }
+
+$(zip, concat);
 
 export function filterBy(ch, other, bool=false){
   var c = chan();
@@ -418,7 +459,6 @@ export function takeUntilBy(ch, other, bool=true){
   var c = chan();
 
   go(function*(){
-    let el;
     yield other;
     bool = false;
   });
@@ -435,7 +475,7 @@ export function takeUntilBy(ch, other, bool=true){
 
 
 export function bufferBy(ch, other){
-  var c = chan(), arr = [], done = false;
+  var c = chan(), arr = [];
 
   go(function*(){
     let el;
@@ -458,3 +498,6 @@ export function bufferBy(ch, other){
   return c;
 
 }
+
+$(filterBy, sampledBy, takeWhileBy, takeUntilBy, bufferBy);
+

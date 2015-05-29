@@ -9,6 +9,7 @@ import { EventEmitter } from 'events';
 
 import {
   // create
+  chain as _,
   later,
   sequentially,
   interval,
@@ -229,7 +230,7 @@ describe('combine', ()=>{
     var c1 = sequentially(100, [1, 2, 3, 4, 5]);
     var c2 = sequentially(200, ['a', 'b', 'c']);
     var c3 = sequentially(300, ['Ω', '∫']);
-    (yield into([], zip([c1, c2, c3]))).should.eql([ [1, 'a', 'Ω'], [2, 'b', '∫']]);
+    (yield into([], zip(c1, c2, c3))).should.eql([ [1, 'a', 'Ω'], [2, 'b', '∫']]);
     done();
   }));
 
@@ -237,7 +238,7 @@ describe('combine', ()=>{
     var c1 = sequentially(50, [1, 2, 3, 4, 5]);
     var c2 = sequentially(100, ['a', 'b', 'c']);
     var c3 = sequentially(100, ['Ω', '∫']);
-    (yield into([], concat([c1, c2, c3]))).should.eql([1, 2, 3, 4, 5, 'a', 'b', 'c', 'Ω', '∫']);
+    (yield into([], concat(c1, c2, c3))).should.eql([1, 2, 3, 4, 5, 'a', 'b', 'c', 'Ω', '∫']);
     done();
   }));
 });
@@ -279,7 +280,16 @@ describe('combine two', ()=> {
     (yield into([], bufferBy(c1, c2))).should.eql([[1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11, 12, 13]]); // iknorite!
     done();
   }));
-
 });
 
+describe('chaining', () => {
+  it('can be chained', done => go(function*(){
+    let res = yield _(sequentially(100, [1, 2, 3, 4]))
+      .scan((a, b) => a + b, 0)
+      .map(x => x * 2)
+      .into([]).val();
+    res.should.eql([2, 6, 12, 20]);
 
+    done();
+  }));
+});

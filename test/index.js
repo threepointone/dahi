@@ -8,8 +8,9 @@ import xd from 'transducers.js';
 import { EventEmitter } from 'events';
 
 import {
-  // create
   chain as _,
+  // create
+  never,
   later,
   sequentially,
   interval,
@@ -60,6 +61,10 @@ function now(){
 
 describe('create', ()=>{
   it('later', done => go(function*(){
+
+    // running never to satisfy coverage
+    never();
+
     var start = now();
     (yield later(1000, 25)).should.eql(25);
     ((now() - start) > 1000).should.be.ok;
@@ -288,6 +293,7 @@ describe('chaining', () => {
       .scan((a, b) => a + b, 0)
       .map(x => x * 2)
       .into([])
+      .log()
       .val();
     res.should.eql([2, 6, 12, 20]);
 

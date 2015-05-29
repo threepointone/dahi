@@ -39,7 +39,6 @@ convert a function than accepts a `callback` as the first argument, to a channel
 `fromNodeCallback(callback)`
 like `fromCallback`, but accepts a node style callback which gets arguments in the form `(err, res)`.
 
-
 `fromEvents(emitter, event)`
 returns a channel with every `event` from emitter
 
@@ -95,10 +94,10 @@ adds every value from `channel` to a buffer, and then passes it to to `predicate
 
 combine channels
 ---
-`zip(channels)`
+`zip(...channels)`
 Creates a channel with values from `channels` lined up with each other. For example if you have two channels with values `[1, 2, 3]` and `[4, 5, 6, 7]`, the result channel will 'emit' `[1, 4]`, `[2, 5]`, and `[3, 6]`. The result channel will 'emit' the next value only when it has at least one value from each source channel.
 
-`concat(channels)`
+`concat(...channels)`
 Concatenates several `channels` into one channel. Like `csp.merge`, but switches to the next source only after the previous one ends.
 
 

@@ -135,7 +135,6 @@ export function fromEvents(emitter, event){
   return c;
 }
 
-
 export function log(ch, prefix=''){
   var c = chan();
   go(function*(){
@@ -148,8 +147,6 @@ export function log(ch, prefix=''){
   });
   return c;
 }
-
-
 
 export function transduce(ch, xf, bufferOrN=1){
   var c = chan(bufferOrN, xf);

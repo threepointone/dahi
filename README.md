@@ -77,7 +77,7 @@ applies the transducer `xf` to every value in `channel`
 On each value from `channel`, calls `fn` with the previous and current values as arguments. At first time, calls `fn` with `seed` and current value. Puts whatever `fn` returns. If no `seed` is provided, the first value will be used as a seed, and the result channel won't put the first value. If no `fn` function is provided, `(a, b) => [a, b]` will be used.
 
 `scan(channel, fn, seed)`
-On each value from `channel`, calls `fn`with the previous result returned by `fn` and the current value put on the `channel`. At first time, calls `fn` with seed as previous result. Puts forward whatever `fn` returns. If no `seed` is provided, the first value will be used as a `seed`.
+On each value from `channel`, calls `fn` with the previous result returned by `fn` and the current value put on the `channel`. At first time, calls `fn` with seed as previous result. Puts forward whatever `fn` returns. If no `seed` is provided, the first value will be used as a `seed`.
 
 `delay(ch, wait)`
 Delays all takes by `wait` milliseconds.
@@ -115,7 +115,7 @@ Works like `csp.operations.takeWhile`, but instead of using a predicate function
 `takeUntilBy(chan, otherChan)`
 Similar to `takeWhileBy`, but instead of waiting for the first falsey value from `otherChan`, it waits for just any value from it.
 
-`bufferBy(chan, otherChan)`
+`bufferBy(chan, otherChan, flushOnEnd=true)`
 Buffers all values from `chan`, and flushes the buffer on each value from `otherChan`. Also flushes the buffer before end, but you can disable that by passing `flushOnEnd` as `false`.
 
 `log(chan)`
